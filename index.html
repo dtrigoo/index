@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeMaster | Boutique Curada</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --oro: #bfa36a;
+            --negro: #0a0a0a;
+            --gris: #111111;
+            --blanco: #ffffff;
+            --fuente-serifa: 'Cormorant Garamond', serif;
+            --fuente-sans: 'Montserrat', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--negro); color: var(--blanco); font-family: var(--fuente-sans); line-height: 1.6; overflow-x: hidden; }
+
+        header {
+            padding: 25px 8%;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #222; position: sticky; top: 0;
+            background: rgba(10,10,10,0.98); z-index: 1000;
+        }
+        .logo { font-family: var(--fuente-serifa); color: var(--oro); font-size: 2.2rem; text-decoration: none; font-weight: 700; letter-spacing: 3px; }
+        
+        .cart-icon { cursor: pointer; border: 1px solid var(--oro); padding: 10px 20px; font-size: 0.75rem; letter-spacing: 2px; transition: 0.3s; }
+        .cart-icon:hover { background: var(--oro); color: black; }
+
+        .hero { text-align: center; padding: 100px 20px; background: radial-gradient(circle, #1a1a1a 0%, #0a0a0a 100%); }
+        .hero h1 { font-family: var(--fuente-serifa); font-size: 4rem; margin-bottom: 10px; }
+        .hero p { color: var(--oro); text-transform: uppercase; letter-spacing: 5px; font-size: 0.8rem; }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 60px 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 40px; }
+        
+        .card { background: var(--gris); border: 1px solid #222; padding: 30px; text-align: center; transition: 0.5s; cursor: pointer; }
+        .card:hover { border-color: var(--oro); transform: translateY(-5px); }
+        .card img { width: 100%; height: 250px; object-fit: contain; margin-bottom: 20px; }
+        .card h3 { font-family: var(--fuente-serifa); font-size: 1.5rem; margin-bottom: 10px; }
+        .price { color: var(--oro); font-weight: 600; font-size: 1.3rem; margin-bottom: 15px; display: block; }
+
+        .modal {
+            position: fixed; right: -100%; top: 0; width: 500px; height: 100%;
+            background: #0d0d0d; border-left: 1px solid var(--oro); padding: 50px 40px;
+            transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1); z-index: 2000; overflow-y: auto;
+        }
+        .modal.open { right: 0; }
+        .close-btn { cursor: pointer; color: var(--oro); float: right; font-size: 1.2rem; margin-bottom: 20px; }
+
+        .detail-gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 30px; }
+        .detail-gallery img { width: 100%; height: 120px; object-fit: cover; border: 1px solid #222; cursor: pointer; transition: 0.3s; }
+        .detail-gallery img:hover { border-color: var(--oro); }
+        .main-img-detail { width: 100%; height: 350px; object-fit: contain; margin-bottom: 15px; transition: opacity 0.2s ease-in-out; }
+
+        .spec-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #222; font-size: 0.85rem; }
+        .spec-label { color: var(--oro); font-weight: 600; }
+
+        .action-btn { width: 100%; padding: 15px; margin-top: 10px; border: none; cursor: pointer; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        .btn-stripe { background: #635bff; color: white; }
+        .btn-paypal { background: #0070ba; color: white; }
+        .btn-buy { background: var(--oro); color: black; }
+
+        .reacondicionado-tag { font-size: 10px; color: #333; text-align: center; margin-top: 100px; letter-spacing: 1px; text-transform: uppercase; }
+        
+        .cart-item { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 10px; }
+        .remove-item { color: #ff4444; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; border: none; background: none; }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="#" class="logo">TimeMaster</a>
+    <div class="cart-icon" onclick="openCart()">CESTA (<span id="cart-count">0</span>)</div>
+</header>
+
+<div class="hero">
+    <h1>The Masterpiece Collection</h1>
+    <p>Precisión Seleccionada</p>
+</div>
+
+<div class="container">
+    <div class="grid" id="product-grid"></div>
+    <div class="reacondicionado-tag">TODAS LAS PIEZAS DE ESTE CATÁLOGO HAN SIDO REACONDICIONADAS POR EXPERTOS</div>
+</div>
+
+<div id="product-modal" class="modal">
+    <span class="close-btn" onclick="closeModals()">CERRAR ✕</span>
+    <div id="modal-content"></div>
+</div>
+
+<div id="cart-modal" class="modal">
+    <span class="close-btn" onclick="closeModals()">CERRAR ✕</span>
+    <h2 style="font-family: var(--fuente-serifa); color: var(--oro); margin-bottom: 30px;">Su Selección</h2>
+    <div id="cart-items"></div>
+    <div style="margin-top: 30px; border-top: 2px solid var(--oro); padding-top: 20px;">
+        <h3 style="display: flex; justify-content: space-between;">TOTAL: <span id="cart-total">0.00</span>€</h3>
+        <button class="action-btn btn-stripe" onclick="checkout('Stripe')">Pagar con Tarjeta (Stripe)</button>
+        <button class="action-btn btn-paypal" onclick="checkout('PayPal')">Pagar con PayPal</button>
+    </div>
+</div>
+
+<script>
+    const products = [
+        {
+            id: 1, 
+            name: "Casio A168WA Chrome", 
+            price: 47.99, 
+            mainImg: "Casio A168WA Chrome 1.png",
+            gallery: ["Casio A168WA Chrome 2.jpg", "Casio A168WA Chrome 3.jpg"],
+            specs: { 
+                "Marca y Modelo": "Casio Vintage A168WA", 
+                "Referencia": "A168WA-1YES", 
+                "Movimiento": "Cuarzo (Pila)", 
+                "Diámetro": "36.3 mm",
+                "Lug-to-lug": "38.6 mm"
+            }
+        },
+        {
+            id: 2, 
+            name: "Seiko 5 SNXS77 Blue", 
+            price: 194.99, 
+            mainImg: "Seiko 5 SNXS77 Blue 1.png",
+            gallery: ["Seiko 5 SNXS77 Blue 2.jpg", "Seiko 5 SNXS77 Blue 3.jpg"],
+            specs: { 
+                "Marca y Modelo": "Seiko 5 Blue Dial", 
+                "Referencia": "SNXS77K1", 
+                "Movimiento": "Automático (7S26)", 
+                "Diámetro": "37 mm",
+                "Lug-to-lug": "42 mm"
+            }
+        },
+        {
+            id: 3, 
+            name: "Seiko 5 Sports SRPD55", 
+            price: 249.99, 
+            mainImg: "Seiko 5 Sports SRPD55 1.png",
+            gallery: ["Seiko 5 Sports SRPD55 2.jpg", "Seiko 5 Sports SRPD55 3.jpg"],
+            specs: { 
+                "Marca y Modelo": "Seiko 5 Sports", 
+                "Referencia": "SRPD55K1", 
+                "Movimiento": "Automático (4R36)", 
+                "Diámetro": "42.5 mm",
+                "Lug-to-lug": "46 mm"
+            }
+        }
+    ];
+
+    let cart = [];
+
+    function init() {
+        const grid = document.getElementById('product-grid');
+        grid.innerHTML = products.map(p => `
+            <div class="card" onclick="openProduct(${p.id})">
+                <img src="${p.mainImg}" alt="${p.name}">
+                <h3>${p.name}</h3>
+                <span class="price">${p.price.toFixed(2)}€</span>
+                <button class="action-btn btn-buy" style="font-size: 0.6rem">Ver Detalles</button>
+            </div>
+        `).join('');
+    }
+
+    function openProduct(id) {
+        const p = products.find(x => x.id === id);
+        const modal = document.getElementById('product-modal');
+        const content = document.getElementById('modal-content');
+        
+        content.innerHTML = `
+            <img src="${p.mainImg}" id="main-view" class="main-img-detail">
+            <h2 class="logo" style="font-size: 1.8rem; margin-bottom: 20px;">${p.name}</h2>
+            <div class="detail-gallery">
+                <img src="${p.mainImg}" onclick="updateMainView(this.src)">
+                ${p.gallery.map(img => `<img src="${img}" onclick="updateMainView(this.src)">`).join('')}
+            </div>
+            <div class="specs">
+                ${Object.entries(p.specs).map(([label, val]) => `
+                    <div class="spec-row"><span class="spec-label">${label}</span><span>${val}</span></div>
+                `).join('')}
+            </div>
+            <div style="font-size: 1.4rem; font-weight: 700; margin: 20px 0;">${p.price.toFixed(2)}€</div>
+            <button class="action-btn btn-buy" onclick="addToCart(${p.id})">Añadir a la Cesta</button>
+        `;
+        modal.classList.add('open');
+    }
+
+    function updateMainView(src) {
+        const mainView = document.getElementById('main-view');
+        mainView.style.opacity = '0';
+        setTimeout(() => {
+            mainView.src = src;
+            mainView.style.opacity = '1';
+        }, 150);
+    }
+
+    function addToCart(id) {
+        const p = products.find(x => x.id === id);
+        cart.push({...p, cartId: Date.now()});
+        updateCartUI();
+        closeModals();
+        openCart();
+    }
+
+    function removeFromCart(cartId) {
+        cart = cart.filter(i => i.cartId !== cartId);
+        updateCartUI();
+    }
+
+    function updateCartUI() {
+        document.getElementById('cart-count').innerText = cart.length;
+        const container = document.getElementById('cart-items');
+        container.innerHTML = cart.map(i => `
+            <div class="cart-item">
+                <div><strong>${i.name}</strong><br><small>${i.price.toFixed(2)}€</small></div>
+                <button class="remove-item" onclick="removeFromCart(${i.cartId})">Eliminar</button>
+            </div>
+        `).join('');
+        const total = cart.reduce((s, i) => s + i.price, 0);
+        document.getElementById('cart-total').innerText = total.toFixed(2);
+    }
+
+    function openCart() { document.getElementById('cart-modal').classList.add('open'); }
+    function closeModals() { 
+        document.getElementById('product-modal').classList.remove('open');
+        document.getElementById('cart-modal').classList.remove('open');
+    }
+
+    function checkout(method) {
+        const total = document.getElementById('cart-total').innerText;
+        if(total == "0.00") return alert("Cesta vacía");
+        
+        const emailNegocio = "cierzoceguer@gmail.com";
+        const itemsList = cart.map(i => i.name).join(", ");
+
+        if(method === 'PayPal') {
+            // Redirige a PayPal con el importe total
+            window.open(`https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${emailNegocio}&item_name=Pedido%20TimeMaster%20(${itemsList})&amount=${total}&currency_code=EUR`);
+        } else if(method === 'Stripe') {
+            // En una web real aquí llamarías a tu servidor. 
+            // Para este ejemplo, simulamos la redirección a Stripe Checkout
+            alert(`Redirigiendo a Stripe para pagar ${total}€...`);
+            window.open("https://checkout.stripe.com/pay");
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>

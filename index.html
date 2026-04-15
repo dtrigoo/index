@@ -110,6 +110,7 @@
             price: 47.99, 
             mainImg: "Casio A168WA Chrome 1.png",
             gallery: ["Casio A168WA Chrome 2.jpg", "Casio A168WA Chrome 3.jpg"],
+            stripeUrl: "https://buy.stripe.com/eVq6oH4zM32Q0fRadLgfu02",
             specs: { 
                 "Marca y Modelo": "Casio Vintage A168WA", 
                 "Referencia": "A168WA-1YES", 
@@ -124,6 +125,7 @@
             price: 194.99, 
             mainImg: "Seiko 5 SNXS77 Blue 1.png",
             gallery: ["Seiko 5 SNXS77 Blue 2.jpg", "Seiko 5 SNXS77 Blue 3.jpg"],
+            stripeUrl: "https://buy.stripe.com/7sYcN51nA32Q0fR85Dgfu01",
             specs: { 
                 "Marca y Modelo": "Seiko 5 Blue Dial", 
                 "Referencia": "SNXS77K1", 
@@ -138,6 +140,7 @@
             price: 249.99, 
             mainImg: "Seiko 5 Sports SRPD55 1.png",
             gallery: ["Seiko 5 Sports SRPD55 2.jpg", "Seiko 5 Sports SRPD55 3.jpg"],
+            stripeUrl: "https://buy.stripe.com/7sY9AT1nA6f22nZeu1gfu00",
             specs: { 
                 "Marca y Modelo": "Seiko 5 Sports", 
                 "Referencia": "SRPD55K1", 
@@ -234,13 +237,15 @@
         const itemsList = cart.map(i => i.name).join(", ");
 
         if(method === 'PayPal') {
-            // Redirige a PayPal con el importe total
             window.open(`https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${emailNegocio}&item_name=Pedido%20TimeMaster%20(${itemsList})&amount=${total}&currency_code=EUR`);
         } else if(method === 'Stripe') {
-            // En una web real aquí llamarías a tu servidor. 
-            // Para este ejemplo, simulamos la redirección a Stripe Checkout
-            alert(`Redirigiendo a Stripe para pagar ${total}€...`);
-            window.open("https://checkout.stripe.com/pay");
+            if (cart.length > 1) {
+                alert("Stripe: Por favor, procese la compra de cada artículo individualmente.");
+                return;
+            }
+            // Abre el enlace específico del reloj que está en el carrito
+            const item = cart[0];
+            window.open(item.stripeUrl);
         }
     }
 
